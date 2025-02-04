@@ -1,0 +1,15 @@
+spring:
+  config:
+    import: optional:file:env/.env.prod[.properties]
+
+springdoc:
+  swagger-ui:
+    enabled: false
+  api-docs:
+    enabled: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: [ ]

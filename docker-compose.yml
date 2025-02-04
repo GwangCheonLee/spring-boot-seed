@@ -1,0 +1,22 @@
+services:
+  spring-boot-seed:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: spring-boot-seed:latest
+    container_name: spring-boot-seed
+    restart: always
+    environment:
+      TZ: "${TIME_ZONE}"
+    env_file:
+      - .env
+    ports:
+      - "8080:${PORT}"
+    volumes:
+      - ./logs:/var/logs/app
+    networks:
+      - infra
+
+networks:
+  infra:
+    external: true

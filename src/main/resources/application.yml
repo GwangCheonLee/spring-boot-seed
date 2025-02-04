@@ -1,0 +1,41 @@
+spring:
+  application:
+    name: spring-boot-seed
+
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
+    driver-class-name: ${DATABASE_DRIVER}
+    timezone: ${DATABASE_TIMEZONE}
+    globally-quoted-identifiers: ${DATABASE_GLOBALLY_QUOTED_IDENTIFIERS}
+
+  jpa:
+    database-platform: ${DATABASE_DIALECT}
+    hibernate:
+      ddl-auto: ${DATABASE_HBM2DDL_AUTO}
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: ${PORT:8080}
+  servlet:
+    context-path: /api
+  setting:
+    timezone: ${TIME_ZONE}
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+
+  file:
+    name: ${LOG_PATH:logs}/spring-boot-seed.log
+
+  logback:
+    rollingpolicy:
+      file-name-pattern: ${LOG_PATH:logs}/spring-boot-seed-%d{yyyy-MM-dd}.%i.log.gz
+      max-history: 0
+      max-file-size: 10MB
+      total-size-cap: 0
