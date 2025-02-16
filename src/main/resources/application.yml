@@ -2,6 +2,10 @@ spring:
   application:
     name: spring-boot-seed
 
+  web:
+    resources:
+      add-mappings: false
+
   flyway:
     enabled: true
 

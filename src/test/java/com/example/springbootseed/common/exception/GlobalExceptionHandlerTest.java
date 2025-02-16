@@ -6,6 +6,7 @@ import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.servlet.NoHandlerFoundException;
 
 class GlobalExceptionHandlerTest {
 
@@ -25,5 +26,25 @@ class GlobalExceptionHandlerTest {
         assertThat(response.getBody()).containsEntry("error", "Internal Server Error");
         assertThat(response.getBody()).containsEntry("message",
             "An unexpected error occurred on the server.");
+    }
+
+    @Test
+    void testHandleNoHandlerFoundException() {
+        // Given
+        NoHandlerFoundException noHandlerFoundException = new NoHandlerFoundException("GET",
+            "/api/nonexistent", null);
+
+        // When
+        ResponseEntity<Map<String, Object>> response = exceptionHandler.handleNoHandlerFoundException(
+            noHandlerFoundException);
+
+        // Then
+        assertThat(response.getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+        assertThat(response.getBody()).isNotNull();
+        assertThat(response.getBody()).containsKeys("status", "error", "message");
+        assertThat(response.getBody()).containsEntry("status", HttpStatus.NOT_FOUND.value());
+        assertThat(response.getBody()).containsEntry("error", "Not Found");
+        assertThat(response.getBody()).containsEntry("message",
+            "The requested resource was not found.");
     }
 }
