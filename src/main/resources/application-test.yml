@@ -6,3 +6,7 @@ spring:
     console:
       enabled: true
       path: /h2-console
+
+  flyway:
+    placeholders:
+      uuidFunction: random_uuid()

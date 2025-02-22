@@ -8,6 +8,8 @@ spring:
 
   flyway:
     enabled: true
+    placeholders:
+      uuidFunction: uuid_generate_v4()
 
   datasource:
     url: ${DATABASE_URL}
