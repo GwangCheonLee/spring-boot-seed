@@ -12,8 +12,12 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.test.context.ActiveProfiles;
 
+/**
+ * {@link QuerydslConfig} 클래스의 JPAQueryFactory 빈 등록 여부를 검증하는 테스트입니다.
+ */
 @SpringBootTest
 @ActiveProfiles("test")
+@DisplayName("QuerydslConfig - JPAQueryFactory 등록 테스트")
 class QuerydslConfigTest {
 
     @Autowired
@@ -22,17 +26,31 @@ class QuerydslConfigTest {
     @PersistenceContext
     private EntityManager entityManager;
 
+    /**
+     * Spring 컨텍스트에 {@link JPAQueryFactory} 빈이 정상 등록되어 있는지 확인합니다.
+     */
     @Test
-    @DisplayName("JPAQueryFactory 빈이 정상적으로 로드되었는지 확인")
-    void jpaQueryFactoryBeanIsLoaded() {
+    @DisplayName("JPAQueryFactory 빈 등록 확인")
+    void shouldLoadJPAQueryFactoryBeanFromContext() {
         JPAQueryFactory jpaQueryFactory = applicationContext.getBean(JPAQueryFactory.class);
-        assertThat(jpaQueryFactory).isNotNull();
+
+        assertThat(jpaQueryFactory)
+            .as("JPAQueryFactory 빈이 ApplicationContext에 등록되어 있어야 한다")
+            .isNotNull();
     }
 
+    /**
+     * EntityManager를 수동 주입하여 JPAQueryFactory 인스턴스를 직접 생성할 수 있는지 확인합니다.
+     */
     @Test
-    @DisplayName("JPAQueryFactory를 이용하여 간단한 쿼리를 실행할 수 있는지 확인")
-    void jpaQueryFactoryCanExecuteQuery() {
+    @DisplayName("EntityManager로 JPAQueryFactory 직접 생성 가능 여부 확인")
+    void shouldCreateJPAQueryFactoryManually() {
+        assertThat(entityManager).isNotNull();
+
         JPAQueryFactory jpaQueryFactory = new JPAQueryFactory(entityManager);
-        assertThat(jpaQueryFactory).isNotNull();
+
+        assertThat(jpaQueryFactory)
+            .as("EntityManager로 JPAQueryFactory 직접 생성이 가능해야 한다")
+            .isNotNull();
     }
 }
