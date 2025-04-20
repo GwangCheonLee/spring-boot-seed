@@ -38,13 +38,3 @@ logging:
   level:
     root: INFO
     org.springframework.web: INFO
-
-  file:
-    name: ${LOG_PATH:logs}/spring-boot-seed.log
-
-  logback:
-    rollingpolicy:
-      file-name-pattern: ${LOG_PATH:logs}/spring-boot-seed-%d{yyyy-MM-dd}.%i.log.gz
-      max-history: 0
-      max-file-size: 10MB
-      total-size-cap: 0
