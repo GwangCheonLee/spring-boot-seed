@@ -6,6 +6,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -31,7 +33,7 @@ public class SecurityConfig {
      * @throws Exception 설정 과정에서 발생할 수 있는 예외
      */
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         // CSRF 보호 비활성화 (REST API 환경에서는 불필요)
         httpSecurity.csrf(AbstractHttpConfigurer::disable);
 
@@ -39,21 +41,46 @@ public class SecurityConfig {
         httpSecurity.sessionManagement(
             session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
-        // 요청별 접근 제어 설정
         httpSecurity.authorizeHttpRequests(authorizeHttpRequests -> {
-            authorizeHttpRequests.requestMatchers("/").permitAll();
 
             // 운영 환경이 아닌 경우 Swagger 및 Actuator 접근 허용
             if (!isProdProfile()) {
-                authorizeHttpRequests.requestMatchers("/swagger-ui.html", "/v3/api-docs/**",
-                    "/actuator/**").permitAll();
+                authorizeHttpRequests.requestMatchers(
+                    "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**",
+                    "/swagger-resources/**", "/webjars/**",
+                    "/actuator/**"
+                ).permitAll();
+            } else {
+                authorizeHttpRequests.requestMatchers("/actuator/health").permitAll();
+                authorizeHttpRequests.requestMatchers(
+                    "/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**",
+                    "/swagger-resources/**", "/webjars/**",
+                    "/actuator/**"
+                ).denyAll();
             }
 
             // 그 외의 모든 요청은 인증 필요
             authorizeHttpRequests.anyRequest().authenticated();
         });
 
+        // 폼 로그인 및 HTTP Basic 인증 비활성화
+        httpSecurity.formLogin(AbstractHttpConfigurer::disable);
+        httpSecurity.httpBasic(AbstractHttpConfigurer::disable);
+
         return httpSecurity.build();
+    }
+
+
+    /**
+     * AuthenticationManager Bean 등록
+     *
+     * @param http HttpSecurity 객체
+     * @return AuthenticationManager 인증 관리자 객체
+     * @throws Exception 설정 과정에서 발생할 수 있는 예외
+     */
+    @Bean
+    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
+        return http.getSharedObject(AuthenticationManagerBuilder.class).build();
     }
 
     /**

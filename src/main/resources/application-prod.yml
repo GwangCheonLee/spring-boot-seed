@@ -2,29 +2,15 @@ spring:
   config:
     import: optional:file:env/.env.prod[.properties]
 
-springdoc:
-  swagger-ui:
-    enabled: false
-  api-docs:
-    enabled: false
-
 management:
   endpoints:
     web:
       exposure:
-        include: [ ]
+        include: health
+  endpoint:
+    health:
+      show-details: never
 
-logging:
-  level:
-    root: INFO
-    org.springframework.web: INFO
-
-  file:
-    name: ${LOG_PATH:logs}/spring-boot-seed.log
-
-  logback:
-    rollingpolicy:
-      file-name-pattern: ${LOG_PATH:logs}/spring-boot-seed-%d{yyyy-MM-dd}.%i.log.gz
-      max-history: 0
-      max-file-size: 10MB
-      total-size-cap: 0
+springdoc:
+  swagger-ui:
+    enabled: false

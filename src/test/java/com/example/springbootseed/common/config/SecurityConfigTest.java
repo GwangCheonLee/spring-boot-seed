@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -19,13 +18,15 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * SecurityConfig의 동작을 검증하기 위한 테스트 클래스
  */
-@SpringBootTest(properties = {
-    "springdoc.api-docs.enabled=false",
-    "springdoc.swagger-ui.enabled=false"
-})
+@SpringBootTest(
+    classes = SecurityConfigTest.class,
+    properties = {
+        "springdoc.api-docs.enabled=false",
+        "springdoc.swagger-ui.enabled=false"
+    }
+)
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
-@Import(SecurityConfigTest.TestController.class)
 class SecurityConfigTest {
 
     @Autowired
@@ -38,7 +39,7 @@ class SecurityConfigTest {
     void testPublicEndpoints() throws Exception {
         // 루트 경로 접근 테스트
         mockMvc.perform(get("/"))
-            .andExpect(status().isOk());
+            .andExpect(status().isUnauthorized());
 
         // Swagger UI 접근 테스트
 
@@ -50,7 +51,7 @@ class SecurityConfigTest {
     @Test
     void testPostWithoutCsrf() throws Exception {
         mockMvc.perform(post("/"))
-            .andExpect(status().isOk());
+            .andExpect(status().isForbidden());
     }
 
     /**
@@ -59,7 +60,7 @@ class SecurityConfigTest {
     @Test
     void testSecuredEndpointWithoutAuthentication() throws Exception {
         mockMvc.perform(get("/secured"))
-            .andExpect(status().isForbidden());
+            .andExpect(status().isUnauthorized());
     }
 
     /**

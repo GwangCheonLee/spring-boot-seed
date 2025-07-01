@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+  <!-- 0. 콘솔 로그 유지 -->
+  <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="TEXT_FILE">
+    <encoder>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+    <file>logs/txt/app-log.txt</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>logs/txt/app-log-%d{yyyy-MM-dd}.txt</fileNamePattern>
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+  </appender>
+
+  <!-- 1. 텍스트 로그 파일 -->
+  <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="JSON_FILE">
+    <encoder class="net.logstash.logback.encoder.LogstashEncoder">
+      <customFields>{"app":"my-service","env":"${spring.profiles.active:-local}"}</customFields>
+    </encoder>
+    <file>logs/json/app-log.json</file>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>logs/json/app-log-%d{yyyy-MM-dd}.json</fileNamePattern>
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+  </appender>
+
+  <!-- 2. JSON 로그 파일 (ELK, 머신 처리용) -->
+  <appender class="ch.qos.logback.core.rolling.RollingFileAppender" name="ERROR_FILE">
+    <encoder>
+      <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n</pattern>
+    </encoder>
+    <file>logs/error/error-log.txt</file>
+    <filter class="ch.qos.logback.classic.filter.LevelFilter">
+      <level>ERROR</level>
+      <onMatch>ACCEPT</onMatch>
+      <onMismatch>DENY</onMismatch>
+    </filter>
+    <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+      <fileNamePattern>logs/error/error-log-%d{yyyy-MM-dd}.txt</fileNamePattern>
+      <maxHistory>30</maxHistory>
+    </rollingPolicy>
+  </appender>
+
+  <!-- 3. ERROR 로그 파일 (에러만 따로 저장) -->
+  <include resource="org/springframework/boot/logging/logback/base.xml"/>
+
+  <!-- 4. 로컬 환경: 콘솔 로그 출력 -->
+  <springProfile name="local">
+    <root>
+      <appender-ref ref="CONSOLE"/>
+    </root>
+  </springProfile>
+
+  <!-- 5. 개발 환경: 전체 로그 출력 -->
+  <springProfile name="dev">
+    <root>
+      <appender-ref ref="CONSOLE"/>
+      <appender-ref ref="TEXT_FILE"/>
+      <appender-ref ref="JSON_FILE"/>
+      <appender-ref ref="ERROR_FILE"/>
+    </root>
+  </springProfile>
+
+  <!-- 6. 운영 환경: INFO 이상, JSON 중심 저장 -->
+  <springProfile name="prod">
+    <root>
+      <appender-ref ref="CONSOLE"/>
+      <appender-ref ref="TEXT_FILE"/>
+      <appender-ref ref="JSON_FILE"/>
+      <appender-ref ref="ERROR_FILE"/>
+    </root>
+  </springProfile>
+
+</configuration>

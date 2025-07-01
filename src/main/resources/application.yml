@@ -2,39 +2,37 @@ spring:
   application:
     name: spring-boot-seed
 
-  web:
-    resources:
-      add-mappings: false
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: ${DB_DRIVER}
+    timezone: ${DB_TIMEZONE:UTC}
+    globally-quoted-identifiers: ${DB_GLOBALLY_QUOTED_IDENTIFIERS:false}
+
+  jpa:
+    hibernate:
+      ddl-auto: ${HIBERNATE_DDL:validate}
+    show-sql: ${JPA_SHOW_SQL:false}
+    properties:
+      hibernate:
+        format_sql: ${JPA_FORMAT_SQL:false}
 
   flyway:
-    enabled: true
+    enabled: ${FLYWAY_ENABLED:true}
+    baseline-on-migrate: ${FLYWAY_BASELINE:false}
+    locations: ${FLYWAY_LOCATIONS:classpath:db/migration}
     placeholders:
       uuidFunction: uuid_generate_v4()
 
-  datasource:
-    url: ${DATABASE_URL}
-    username: ${DATABASE_USERNAME}
-    password: ${DATABASE_PASSWORD}
-    driver-class-name: ${DATABASE_DRIVER}
-    timezone: ${DATABASE_TIMEZONE}
-    globally-quoted-identifiers: ${DATABASE_GLOBALLY_QUOTED_IDENTIFIERS}
-
-  jpa:
-    database-platform: ${DATABASE_DIALECT}
-    hibernate:
-      ddl-auto: ${DATABASE_HBM2DDL_AUTO}
-    properties:
-      hibernate:
-        format_sql: true
+logging:
+  level:
+    web: ${LOG_LEVEL:INFO}
+    org.hibernate.SQL: ${HIBERNATE_SQL_LOG_LEVEL:INFO}
 
 server:
-  port: ${PORT:8080}
+  port: ${SERVER_PORT:8080}
   servlet:
     context-path: /api
   setting:
     timezone: ${TIME_ZONE}
-
-logging:
-  level:
-    root: INFO
-    org.springframework.web: INFO
